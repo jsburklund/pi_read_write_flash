@@ -64,6 +64,25 @@ void setAllPinsInput(void* gpio_memory) {
   setAllPinsFLSELValue(gpio_memory, 0b000);
 }
 
+// TODO are the sleep times sufficient, or does this need busywait?
+void setNoPinPulls(void* gpio_memory) {
+  // All inputs pull up/down disabled.
+  const uint32_t gppud_value = 0b00;
+  const uint32_t gppud_clk0_value =
+      0b1 << 2 | 0b1 << 3 | 0b1 << 4 | 0b1 << 7 |
+      0b1 << 8 | 0b1 << 9 | 0b1 << 10 | 0b1 << 11;
+
+  // Set GPPUD.
+  *((uint32_t*) (gpio_memory + 0x94)) = gppud_value;
+  std::this_thread::sleep_for(150ns);
+  // Set GPPUDCLK0.
+  *((uint32_t*) (gpio_memory + 0x98)) = gppud_clk0_value;
+  std::this_thread::sleep_for(150ns);
+  // Clear the clock.
+  *((uint32_t*) (gpio_memory + 0x94)) = gppud_value;
+  *((uint32_t*) (gpio_memory + 0x98)) = gppud_clk0_value;
+}
+
 const std::string kGPIOMemoryFilename{"/dev/gpiomem"};
 int main() {
 
@@ -118,6 +137,9 @@ int main() {
 
   // Set all pins back to input?
   setAllPinsInput(gpio_memory);
+
+  std::this_thread::sleep_for(2s);
+  setNoPinPulls(gpio_memory);
 
 
   const int munmap_result = munmap(gpio_memory, 4096);

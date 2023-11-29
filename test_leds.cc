@@ -93,6 +93,33 @@ void setNoPinPulls(void* gpio_memory) {
   *((uint32_t*) (gpio_memory + 0x98)) = gppud_clk0_value;
 }
 
+uint32_t getMaskValue(uint8_t value, uint8_t bit, uint8_t pin) {
+  return ((value >> bit) & 0b1) << pin;
+}
+
+uint32_t* GPSET0Register(void* gpio_memory) {
+  return static_cast<uint32_t*>(gpio_memory + 0x1c);
+}
+
+uint32_t* GPCLR0Register(void* gpio_memory) {
+  return static_cast<uint32_t*>(gpio_memory + 0x28);
+}
+
+void setPinsToValue(void* gpio_memory, uint8_t value) {
+  const uint32_t set_mask =
+    getMaskValue(value, 0, 11) | getMaskValue(value, 1, 17) |
+    getMaskValue(value, 2, 18) | getMaskValue(value, 3, 22) |
+    getMaskValue(value, 4, 23) | getMaskValue(value, 5, 24) |
+    getMaskValue(value, 6, 25) | getMaskValue(value, 7, 27);
+  const uint32_t clear_mask =
+    getMaskValue(~value, 0, 11) | getMaskValue(~value, 1, 17) |
+    getMaskValue(~value, 2, 18) | getMaskValue(~value, 3, 22) |
+    getMaskValue(~value, 4, 23) | getMaskValue(~value, 5, 24) |
+    getMaskValue(~value, 6, 25) | getMaskValue(~value, 7, 27);
+  *GPSET0Register(gpio_memory) = set_mask;
+  *GPCLR0Register(gpio_memory) = clear_mask;
+}
+
 const std::string kGPIOMemoryFilename{"/dev/gpiomem"};
 int main() {
 
@@ -116,15 +143,6 @@ int main() {
   }
 
   std::cout << "SUCCESS!!!!" << std::endl;
-
-  // Extract the FSEL values.
-  const uint32_t gpfsel0 = *((uint32_t*) gpio_memory);
-  const uint32_t gpfsel1 = *((uint32_t*) (gpio_memory + 0x04));
-  const uint32_t gpfsel2 = *((uint32_t*) (gpio_memory + 0x08));
-  std::cout << "GPFSEL0: " << std::bitset<32>(gpfsel0) << std::endl;
-  std::cout << "GPFSEL1: " << std::bitset<32>(gpfsel1) << std::endl;
-  std::cout << "GPFSEL2: " << std::bitset<32>(gpfsel2) << std::endl;
-
   {
     const uint32_t gplev0 = *((uint32_t*) (gpio_memory + 0x0034));
     const uint32_t gplev1 = *((uint32_t*) (gpio_memory + 0x0038));
@@ -134,19 +152,34 @@ int main() {
 
   // Try to blink the leds?
   setAllPinsOutput(gpio_memory);
-  {
-    const uint32_t leds =
-      0b1 << 11 | 0b1 << 17 | 0b1 << 18 | 0b1 << 22 |
-      0b1 << 23 | 0b1 << 24 | 0b1 << 25 | 0b1 << 27;
-    for (int i=0; i < 5; ++i) {
-      // set
-      *((uint32_t*) (gpio_memory + 0x001C)) = leds;
-      std::this_thread::sleep_for(400ms);
-      // clear
-      *((uint32_t*) (gpio_memory + 0x0028)) = leds;
-      std::this_thread::sleep_for(400ms);
-    }
+
+  setPinsToValue(gpio_memory, 0x00);
+  std::this_thread::sleep_for(2s);
+
+  setPinsToValue(gpio_memory, 0x55);
+  std::this_thread::sleep_for(2s);
+  setPinsToValue(gpio_memory, 0xAA);
+  std::this_thread::sleep_for(2s);
+
+  setPinsToValue(gpio_memory, 0x0f);
+  std::this_thread::sleep_for(2s);
+  setPinsToValue(gpio_memory, 0xf0);
+  std::this_thread::sleep_for(2s);
+
+  setPinsToValue(gpio_memory, 0x11);
+  std::this_thread::sleep_for(1s);
+  setPinsToValue(gpio_memory, 0x22);
+  std::this_thread::sleep_for(1s);
+  setPinsToValue(gpio_memory, 0x44);
+  std::this_thread::sleep_for(1s);
+  setPinsToValue(gpio_memory, 0x88);
+  std::this_thread::sleep_for(1s);
+
+  for (int i=0; i <= 255; ++i) {
+    setPinsToValue(gpio_memory, static_cast<uint8_t>(i));
+    std::this_thread::sleep_for(200ms);
   }
+  setPinsToValue(gpio_memory, 0x00);
 
   // Set all pins back to input?
   setAllPinsInput(gpio_memory);

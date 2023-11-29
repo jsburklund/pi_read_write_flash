@@ -7,24 +7,24 @@ Information is extracted from:
 
 # Pinout
 
-BIT | GPIO | Register | Pin    | GPIO-Bits
-------------------------------------------
-  0 |   11 |  GPFSEL1 | FSEL11 | 5-3
-  1 |   17 |  GPFSEL1 | FSEL17 | 23-21
-  2 |   18 |  GPFSEL1 | FSEL18 | 26-24
-  3 |   22 |  GPFSEL2 | FSEL22 | 8-6
-  4 |   23 |  GPFSEL2 | FSEL23 | 11-9
-  5 |   24 |  GPFSEL2 | FSEL24 | 14-12
-  6 |   25 |  GPFSEL2 | FSEL25 | 17-15
-  7 |   27 |  GPFSEL2 | FSEL27 | 23-21
+| BIT | GPIO | Register | Pin    | GPIO-Bits |
+| --- | ---- | -------- | ------ | --------- |
+|   0 |   11 |  GPFSEL1 | FSEL11 | 5-3       |
+|   1 |   17 |  GPFSEL1 | FSEL17 | 23-21     |
+|   2 |   18 |  GPFSEL1 | FSEL18 | 26-24     |
+|   3 |   22 |  GPFSEL2 | FSEL22 | 8-6       |
+|   4 |   23 |  GPFSEL2 | FSEL23 | 11-9      |
+|   5 |   24 |  GPFSEL2 | FSEL24 | 14-12     |
+|   6 |   25 |  GPFSEL2 | FSEL25 | 17-15     |
+|   7 |   27 |  GPFSEL2 | FSEL27 | 23-21     |
 
 # Function Select Register Addresses
 
-Register | Memory Address
--------------------------
-GPFSEL0  | 0x7e200000
-GPFSEL1  | 0x7e200004
-GPFSEL2  | 0x7e200008
+| Register | Memory Address |
+| -------- | -------------- |
+| GPFSEL0  | 0x7e200000     |
+| GPFSEL1  | 0x7e200004     |
+| GPFSEL2  | 0x7e200008     |
 
 Function Select Values:
  - 000 = GPIO Pin is an input
@@ -61,17 +61,12 @@ GPFLSEL2: 00 000 000 000 000 100 100 000 000 000 100
                      27      25  24  23  22
                                                
 ```
-  4 |   23 |  GPFSEL2 | FSEL23 | 11-9
-  5 |   24 |  GPFSEL2 | FSEL24 | 14-12
-  6 |   25 |  GPFSEL2 | FSEL25 | 17-15
-  7 |   27 |  GPFSEL2 | FSEL27 | 23-21
-
 
 
 # Pin Set/Clear Register Addresses
 
-Register | Memory Address
--------------------------
-GPSET0   | 0x7e20001c
-GPCLR0   | 0x7e200028
+| Register | Memory Address |
+| -------- | -------------- |
+| GPSET0   | 0x7e20001c     |
+| GPCLR0   | 0x7e200028     |
 

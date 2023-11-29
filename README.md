@@ -9,14 +9,14 @@ Information is extracted from:
 
 BIT | GPIO | Register | Pin    | GPIO-Bits
 ------------------------------------------
-  0 |    2 |  GPFSEL0 | FSEL2  | 8-6
-  1 |    3 |  GPFSEL0 | FSEL3  | 11-9
-  2 |    4 |  GPFSEL0 | FSEL4  | 14-12
-  3 |    7 |  GPFSEL0 | FSEL7  | 23-21
-  4 |    8 |  GPFSEL0 | FSEL8  | 26-24
-  5 |    9 |  GPFSEL0 | FSEL9  | 29-27
-  6 |   10 |  GPFSEL1 | FSEL10 | 0-2
-  7 |   11 |  GPFSEL1 | FSEL11 | 5-3
+  0 |   11 |  GPFSEL1 | FSEL11 | 5-3
+  1 |   17 |  GPFSEL1 | FSEL17 | 23-21
+  2 |   18 |  GPFSEL1 | FSEL18 | 26-24
+  3 |   22 |  GPFSEL2 | FSEL22 | 8-6
+  4 |   23 |  GPFSEL2 | FSEL23 | 11-9
+  5 |   24 |  GPFSEL2 | FSEL24 | 14-12
+  6 |   25 |  GPFSEL2 | FSEL25 | 17-15
+  7 |   27 |  GPFSEL2 | FSEL27 | 23-21
 
 # Function Select Register Addresses
 
@@ -40,24 +40,31 @@ Function Select Values:
 
 Values after booting the OS:
 
-`raspi-gpio get 2,3,4,7,8,9,10,11`
+`raspi-gpio get 11,17,18,22,23,24,25,27`
 ```
-GPIO 2: level=1 fsel=0 func=INPUT
-GPIO 3: level=1 fsel=0 func=INPUT
-GPIO 4: level=1 fsel=0 func=INPUT
-GPIO 7: level=1 fsel=0 func=INPUT
-GPIO 8: level=1 fsel=0 func=INPUT
-GPIO 9: level=0 fsel=0 func=INPUT
-GPIO 10: level=0 fsel=0 func=INPUT
 GPIO 11: level=0 fsel=0 func=INPUT
+GPIO 17: level=0 fsel=0 func=INPUT
+GPIO 18: level=0 fsel=0 func=INPUT
+GPIO 22: level=0 fsel=0 func=INPUT
+GPIO 23: level=0 fsel=0 func=INPUT
+GPIO 24: level=0 fsel=0 func=INPUT
+GPIO 25: level=0 fsel=0 func=INPUT
+GPIO 27: level=0 fsel=0 func=INPUT
 ```
 
 ```
 GPFLSEL0: 00 000 000 000 001 001 000 000 000 100 100
               9   8   7           4   3   2
 GPFLSEL1: 00 000 000 000 001 100 100 000 000 000 000
-                                             11  10
+                 18  17                      11  10
+GPFLSEL2: 00 000 000 000 000 100 100 000 000 000 100
+                     27      25  24  23  22
+                                               
 ```
+  4 |   23 |  GPFSEL2 | FSEL23 | 11-9
+  5 |   24 |  GPFSEL2 | FSEL24 | 14-12
+  6 |   25 |  GPFSEL2 | FSEL25 | 17-15
+  7 |   27 |  GPFSEL2 | FSEL27 | 23-21
 
 
 

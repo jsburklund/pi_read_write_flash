@@ -11,57 +11,67 @@
 
 using namespace std::chrono_literals;
 
-uint32_t getFLSELMask(uint pin) {
+uint32_t* GPFSEL0Register(void* gpio_memory) {
+  return static_cast<uint32_t*>(gpio_memory);
+}
+
+uint32_t* GPFSEL1Register(void* gpio_memory) {
+  return static_cast<uint32_t*>(gpio_memory + 0x04);
+}
+
+uint32_t* GPFSEL2Register(void* gpio_memory) {
+  return static_cast<uint32_t*>(gpio_memory + 0x08);
+}
+
+uint32_t getFSELMask(uint pin) {
   return 0b111 << (pin % 10) * 3;
 }
 
-uint32_t setFLSELValue(uint pin, uint8_t flsel_value) {
-  return (flsel_value & 0b111) << (pin % 10) * 3;
+uint32_t setFSELValue(uint pin, uint8_t fsel_value) {
+  return (fsel_value & 0b111) << (pin % 10) * 3;
 }
 
 // TODO does this need memory barriers, or volatile?
-void setAllPinsFLSELValue(void* gpio_memory, uint8_t flsel_value) {
-  // Setup GPFLSEL0.
-  const uint32_t gpflsel0_curr = *((uint32_t*) gpio_memory);
-  const uint32_t gpflsel0_mask =
-      getFLSELMask(2) | getFLSELMask(3) | getFLSELMask(4) |
-      getFLSELMask(7) | getFLSELMask(8) | getFLSELMask(9);
-  const uint32_t gpflsel0_update =
-      (gpflsel0_curr & ~gpflsel0_mask) |
-      setFLSELValue(2, flsel_value) | setFLSELValue(3, flsel_value) |
-      setFLSELValue(4, flsel_value) | setFLSELValue(7, flsel_value) |
-      setFLSELValue(8, flsel_value) | setFLSELValue(9, flsel_value);
-  std::cout << "GPFLSEL0: " << std::bitset<32>(gpflsel0_curr) << std::endl;
-  std::cout << "mask:     " << std::bitset<32>(gpflsel0_mask) << std::endl;
-  std::cout << "update:    " << std::bitset<32>(gpflsel0_update) << std::endl;
-
-  // Write the configuration.
-  *((uint32_t*) (gpio_memory)) = gpflsel0_update;
-  const uint32_t gpflsel0_after = *((uint32_t*) gpio_memory);
-  std::cout << "after:     " << std::bitset<32>(gpflsel0_after) << std::endl;
-
-  // Setup GPFLSEL1.
-  const uint32_t gpflsel1_curr = *((uint32_t*) (gpio_memory + 0x04));
-  const uint32_t gpflsel1_mask = getFLSELMask(10) | getFLSELMask(11);
-  const uint32_t gpflsel1_update =
-      (gpflsel1_curr & ~gpflsel1_mask) |
-      setFLSELValue(10, flsel_value) | setFLSELValue(11, flsel_value);
-  std::cout << "GPFLSEL1: " << std::bitset<32>(gpflsel1_curr) << std::endl;
-  std::cout << "mask:     " << std::bitset<32>(gpflsel1_mask) << std::endl;
-  std::cout << "value:    " << std::bitset<32>(gpflsel1_update) << std::endl;
+void setAllPinsFSELValue(void* gpio_memory, uint8_t fsel_value) {
+  // Setup GPLSEL1.
+  const uint32_t gpfsel1_curr = *GPFSEL1Register(gpio_memory);
+  const uint32_t gpfsel1_mask = getFSELMask(11) | getFSELMask(17) | getFSELMask(18);
+  const uint32_t gpfsel1_update =
+      (gpfsel1_curr & ~gpfsel1_mask) |
+      setFSELValue(11, fsel_value) | setFSELValue(17, fsel_value) | setFSELValue(18, fsel_value);
+  std::cout << "GPFSEL1: " << std::bitset<32>(gpfsel1_curr) << std::endl;
+  std::cout << "mask:    " << std::bitset<32>(gpfsel1_mask) << std::endl;
+  std::cout << "value:   " << std::bitset<32>(gpfsel1_update) << std::endl;
   
   // Write the configuration.
-  *((uint32_t*) (gpio_memory + 0x04)) = gpflsel1_update;
-  const uint32_t gpflsel1_after = *((uint32_t*) (gpio_memory + 0x04));
-  std::cout << "after:     " << std::bitset<32>(gpflsel1_after) << std::endl;
+  *GPFSEL1Register(gpio_memory) = gpfsel1_update;
+  const uint32_t gpfsel1_after = *GPFSEL1Register(gpio_memory);
+  std::cout << "after:   " << std::bitset<32>(gpfsel1_after) << std::endl;
+  
+  // Setup GPFSEL2.
+  const uint32_t gpfsel2_curr = *GPFSEL2Register(gpio_memory);
+  const uint32_t gpfsel2_mask =
+      getFSELMask(22) | getFSELMask(23) | getFSELMask(24) | getFSELMask(25) | getFSELMask(27);
+  const uint32_t gpfsel2_update =
+      (gpfsel2_curr & ~gpfsel2_mask) |
+      setFSELValue(22, fsel_value) | setFSELValue(23, fsel_value) | setFSELValue(24, fsel_value) |
+      setFSELValue(25, fsel_value) | setFSELValue(27, fsel_value);
+  std::cout << "GPFSEL2: " << std::bitset<32>(gpfsel2_curr) << std::endl;
+  std::cout << "mask:    " << std::bitset<32>(gpfsel2_mask) << std::endl;
+  std::cout << "value:   " << std::bitset<32>(gpfsel2_update) << std::endl;
+  
+  // Write the configuration.
+  *GPFSEL2Register(gpio_memory) = gpfsel2_update;
+  const uint32_t gpfsel2_after = *GPFSEL2Register(gpio_memory);
+  std::cout << "after:   " << std::bitset<32>(gpfsel2_after) << std::endl;
 }
 
 void setAllPinsOutput(void* gpio_memory) {
-  setAllPinsFLSELValue(gpio_memory, 0b001);
+  setAllPinsFSELValue(gpio_memory, 0b001);
 }
 
 void setAllPinsInput(void* gpio_memory) {
-  setAllPinsFLSELValue(gpio_memory, 0b000);
+  setAllPinsFSELValue(gpio_memory, 0b000);
 }
 
 // TODO are the sleep times sufficient, or does this need busywait?
@@ -69,8 +79,8 @@ void setNoPinPulls(void* gpio_memory) {
   // All inputs pull up/down disabled.
   const uint32_t gppud_value = 0b00;
   const uint32_t gppud_clk0_value =
-      0b1 << 2 | 0b1 << 3 | 0b1 << 4 | 0b1 << 7 |
-      0b1 << 8 | 0b1 << 9 | 0b1 << 10 | 0b1 << 11;
+      0b1 << 11 | 0b1 << 17 | 0b1 << 18 | 0b1 << 22 |
+      0b1 << 23 | 0b1 << 24 | 0b1 << 25 | 0b1 << 27;
 
   // Set GPPUD.
   *((uint32_t*) (gpio_memory + 0x94)) = gppud_value;
@@ -108,10 +118,12 @@ int main() {
   std::cout << "SUCCESS!!!!" << std::endl;
 
   // Extract the FSEL values.
-  const uint32_t gpflsel0 = *((uint32_t*) gpio_memory);
-  const uint32_t gpflsel1 = *((uint32_t*) (gpio_memory + 0x04));
-  std::cout << "GPFLSEL0: " << std::bitset<32>(gpflsel0) << std::endl;
-  std::cout << "GPFLSEL1: " << std::bitset<32>(gpflsel1) << std::endl;
+  const uint32_t gpfsel0 = *((uint32_t*) gpio_memory);
+  const uint32_t gpfsel1 = *((uint32_t*) (gpio_memory + 0x04));
+  const uint32_t gpfsel2 = *((uint32_t*) (gpio_memory + 0x08));
+  std::cout << "GPFSEL0: " << std::bitset<32>(gpfsel0) << std::endl;
+  std::cout << "GPFSEL1: " << std::bitset<32>(gpfsel1) << std::endl;
+  std::cout << "GPFSEL2: " << std::bitset<32>(gpfsel2) << std::endl;
 
   {
     const uint32_t gplev0 = *((uint32_t*) (gpio_memory + 0x0034));
@@ -124,7 +136,8 @@ int main() {
   setAllPinsOutput(gpio_memory);
   {
     const uint32_t leds =
-      0b1 << 2 | 0b1 << 3 | 0b1 << 4 | 0b1 << 7 | 0b1 << 8 | 0b1 << 9 | 0b1 << 10 | 0b1 << 11;
+      0b1 << 11 | 0b1 << 17 | 0b1 << 18 | 0b1 << 22 |
+      0b1 << 23 | 0b1 << 24 | 0b1 << 25 | 0b1 << 27;
     for (int i=0; i < 5; ++i) {
       // set
       *((uint32_t*) (gpio_memory + 0x001C)) = leds;

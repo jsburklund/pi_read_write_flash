@@ -19,6 +19,51 @@ uint32_t setFLSELValue(uint pin, uint8_t flsel_value) {
   return (flsel_value & 0b111) << (pin % 10) * 3;
 }
 
+// TODO does this need memory barriers, or volatile?
+void setAllPinsFLSELValue(void* gpio_memory, uint8_t flsel_value) {
+  // Setup GPFLSEL0.
+  const uint32_t gpflsel0_curr = *((uint32_t*) gpio_memory);
+  const uint32_t gpflsel0_mask =
+      getFLSELMask(2) | getFLSELMask(3) | getFLSELMask(4) |
+      getFLSELMask(7) | getFLSELMask(8) | getFLSELMask(9);
+  const uint32_t gpflsel0_update =
+      (gpflsel0_curr & ~gpflsel0_mask) |
+      setFLSELValue(2, flsel_value) | setFLSELValue(3, flsel_value) |
+      setFLSELValue(4, flsel_value) | setFLSELValue(7, flsel_value) |
+      setFLSELValue(8, flsel_value) | setFLSELValue(9, flsel_value);
+  std::cout << "GPFLSEL0: " << std::bitset<32>(gpflsel0_curr) << std::endl;
+  std::cout << "mask:     " << std::bitset<32>(gpflsel0_mask) << std::endl;
+  std::cout << "update:    " << std::bitset<32>(gpflsel0_update) << std::endl;
+
+  // Write the configuration.
+  *((uint32_t*) (gpio_memory)) = gpflsel0_update;
+  const uint32_t gpflsel0_after = *((uint32_t*) gpio_memory);
+  std::cout << "after:     " << std::bitset<32>(gpflsel0_after) << std::endl;
+
+  // Setup GPFLSEL1.
+  const uint32_t gpflsel1_curr = *((uint32_t*) (gpio_memory + 0x04));
+  const uint32_t gpflsel1_mask = getFLSELMask(10) | getFLSELMask(11);
+  const uint32_t gpflsel1_update =
+      (gpflsel1_curr & ~gpflsel1_mask) |
+      setFLSELValue(10, flsel_value) | setFLSELValue(11, flsel_value);
+  std::cout << "GPFLSEL1: " << std::bitset<32>(gpflsel1_curr) << std::endl;
+  std::cout << "mask:     " << std::bitset<32>(gpflsel1_mask) << std::endl;
+  std::cout << "value:    " << std::bitset<32>(gpflsel1_update) << std::endl;
+  
+  // Write the configuration.
+  *((uint32_t*) (gpio_memory + 0x04)) = gpflsel1_update;
+  const uint32_t gpflsel1_after = *((uint32_t*) (gpio_memory + 0x04));
+  std::cout << "after:     " << std::bitset<32>(gpflsel1_after) << std::endl;
+}
+
+void setAllPinsOutput(void* gpio_memory) {
+  setAllPinsFLSELValue(gpio_memory, 0b001);
+}
+
+void setAllPinsInput(void* gpio_memory) {
+  setAllPinsFLSELValue(gpio_memory, 0b000);
+}
+
 const std::string kGPIOMemoryFilename{"/dev/gpiomem"};
 int main() {
 
@@ -56,44 +101,8 @@ int main() {
     std::cout << "GPLEV1: " << std::bitset<32>(gplev1) << std::endl;
   }
 
-  // Set all of the 8 io pins to output mode.
-  const uint32_t gpflsel0_mask =
-      getFLSELMask(2) | getFLSELMask(3) | getFLSELMask(4) |
-      getFLSELMask(7) | getFLSELMask(8) | getFLSELMask(9);
-  const uint32_t gpflsel0_update =
-      (gpflsel0 & ~gpflsel0_mask) |
-      setFLSELValue(2, 0b1) | setFLSELValue(3, 0b1) | setFLSELValue(4, 0b1) |
-      setFLSELValue(7, 0b1) | setFLSELValue(8, 0b1) | setFLSELValue(9, 0b1);
-  std::cout << "GPFLSEL0: " << std::bitset<32>(gpflsel0) << std::endl;
-  std::cout << "mask:     " << std::bitset<32>(gpflsel0_mask) << std::endl;
-  std::cout << "value:    " << std::bitset<32>(gpflsel0_update) << std::endl;
-  // Write the configuration.
-  *((uint32_t*) (gpio_memory)) = gpflsel0_update;
-  {
-    const uint32_t gpflsel0_new = *((uint32_t*) gpio_memory);
-    std::cout << "GPFLSEL0: " << std::bitset<32>(gpflsel0_new) << std::endl;
-  }
-
-  const uint32_t gpflsel1_mask = getFLSELMask(10) | getFLSELMask(11);
-  const uint32_t gpflsel1_update =
-      (gpflsel1 & ~gpflsel1_mask) |
-      setFLSELValue(10, 0b1) | setFLSELValue(11, 0b1);
-  std::cout << "GPFLSEL1: " << std::bitset<32>(gpflsel1) << std::endl;
-  std::cout << "mask:     " << std::bitset<32>(gpflsel1_mask) << std::endl;
-  std::cout << "value:    " << std::bitset<32>(gpflsel1_update) << std::endl;
-  // Write the configuration.
-  *((uint32_t*) (gpio_memory + 0x04)) = gpflsel1_update;
-  {
-    const uint32_t gpflsel1_new = *((uint32_t*) (gpio_memory + 0x04));
-    std::cout << "GPFLSEL1: " << std::bitset<32>(gpflsel1_new) << std::endl;
-  }
-
-  // Clear the pullups?
-  {
-
-  }
-
   // Try to blink the leds?
+  setAllPinsOutput(gpio_memory);
   {
     const uint32_t leds =
       0b1 << 2 | 0b1 << 3 | 0b1 << 4 | 0b1 << 7 | 0b1 << 8 | 0b1 << 9 | 0b1 << 10 | 0b1 << 11;
@@ -107,6 +116,8 @@ int main() {
     }
   }
 
+  // Set all pins back to input?
+  setAllPinsInput(gpio_memory);
 
 
   const int munmap_result = munmap(gpio_memory, 4096);

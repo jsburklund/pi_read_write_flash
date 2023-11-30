@@ -11,16 +11,16 @@
 
 using namespace std::chrono_literals;
 
-uint32_t* GPFSEL0Register(void* gpio_memory) {
-  return static_cast<uint32_t*>(gpio_memory);
+volatile uint32_t* GPFSEL0Register(volatile void* gpio_memory) {
+  return static_cast<volatile uint32_t*>(gpio_memory);
 }
 
-uint32_t* GPFSEL1Register(void* gpio_memory) {
-  return static_cast<uint32_t*>(gpio_memory + 0x04);
+volatile uint32_t* GPFSEL1Register(volatile void* gpio_memory) {
+  return static_cast<volatile uint32_t*>(gpio_memory + 0x04);
 }
 
-uint32_t* GPFSEL2Register(void* gpio_memory) {
-  return static_cast<uint32_t*>(gpio_memory + 0x08);
+volatile uint32_t* GPFSEL2Register(volatile void* gpio_memory) {
+  return static_cast<volatile uint32_t*>(gpio_memory + 0x08);
 }
 
 uint32_t getFSELMask(uint pin) {
@@ -32,7 +32,7 @@ uint32_t setFSELValue(uint pin, uint8_t fsel_value) {
 }
 
 // TODO does this need memory barriers, or volatile?
-void setAllPinsFSELValue(void* gpio_memory, uint8_t fsel_value) {
+void setAllPinsFSELValue(volatile void* gpio_memory, uint8_t fsel_value) {
   // Setup GPLSEL1.
   const uint32_t gpfsel1_curr = *GPFSEL1Register(gpio_memory);
   const uint32_t gpfsel1_mask = getFSELMask(11) | getFSELMask(17) | getFSELMask(18);
@@ -66,16 +66,16 @@ void setAllPinsFSELValue(void* gpio_memory, uint8_t fsel_value) {
   std::cout << "after:   " << std::bitset<32>(gpfsel2_after) << std::endl;
 }
 
-void setAllPinsOutput(void* gpio_memory) {
+void setAllPinsOutput(volatile void* gpio_memory) {
   setAllPinsFSELValue(gpio_memory, 0b001);
 }
 
-void setAllPinsInput(void* gpio_memory) {
+void setAllPinsInput(volatile void* gpio_memory) {
   setAllPinsFSELValue(gpio_memory, 0b000);
 }
 
 // TODO are the sleep times sufficient, or does this need busywait?
-void setNoPinPulls(void* gpio_memory) {
+void setNoPinPulls(volatile void* gpio_memory) {
   // All inputs pull up/down disabled.
   const uint32_t gppud_value = 0b00;
   const uint32_t gppud_clk0_value =
@@ -97,15 +97,15 @@ uint32_t getMaskValue(uint8_t value, uint8_t bit, uint8_t pin) {
   return ((value >> bit) & 0b1) << pin;
 }
 
-uint32_t* GPSET0Register(void* gpio_memory) {
-  return static_cast<uint32_t*>(gpio_memory + 0x1c);
+volatile uint32_t* GPSET0Register(volatile void* gpio_memory) {
+  return static_cast<volatile uint32_t*>(gpio_memory + 0x1c);
 }
 
-uint32_t* GPCLR0Register(void* gpio_memory) {
-  return static_cast<uint32_t*>(gpio_memory + 0x28);
+volatile uint32_t* GPCLR0Register(volatile void* gpio_memory) {
+  return static_cast<volatile uint32_t*>(gpio_memory + 0x28);
 }
 
-void setPinsToValue(void* gpio_memory, uint8_t value) {
+void setPinsToValue(volatile void* gpio_memory, uint8_t value) {
   const uint32_t set_mask =
     getMaskValue(value, 0, 11) | getMaskValue(value, 1, 17) |
     getMaskValue(value, 2, 18) | getMaskValue(value, 3, 22) |
@@ -132,7 +132,7 @@ int main() {
     return 1;
   }
 
-  void* gpio_memory =
+  volatile void* gpio_memory =
       mmap(/* address */ nullptr, /* length */ 4096,
            /* prot */ PROT_READ | PROT_WRITE,
            /* flags */ MAP_SHARED, /* fd */ gpio_memory_file, /* offset */ 0);
@@ -188,7 +188,7 @@ int main() {
   setNoPinPulls(gpio_memory);
 
 
-  const int munmap_result = munmap(gpio_memory, 4096);
+  const int munmap_result = munmap(const_cast<void*>(gpio_memory), 4096);
   if (munmap_result) {
     std::cerr << "Could not unmap GPIO memory mappped region" << std::endl;
   }

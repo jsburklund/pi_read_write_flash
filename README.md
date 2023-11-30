@@ -7,16 +7,16 @@ Information is extracted from:
 
 # Pin Out
 
-| BIT | GPIO | Register | Pin    | GPIO-Bits |
-| --- | ---- | -------- | ------ | --------- |
-|   0 |   11 |  GPFSEL1 | FSEL11 | 5-3       |
-|   1 |   17 |  GPFSEL1 | FSEL17 | 23-21     |
-|   2 |   18 |  GPFSEL1 | FSEL18 | 26-24     |
-|   3 |   22 |  GPFSEL2 | FSEL22 | 8-6       |
-|   4 |   23 |  GPFSEL2 | FSEL23 | 11-9      |
-|   5 |   24 |  GPFSEL2 | FSEL24 | 14-12     |
-|   6 |   25 |  GPFSEL2 | FSEL25 | 17-15     |
-|   7 |   27 |  GPFSEL2 | FSEL27 | 23-21     |
+| Pin | NAND | Description   | GPIO | Register | Pin    | GPIO-Bits |
+| --- | ---- | ------------- | ---- | -------- | ------ | --------- |
+| IO0 |   29 | Parallel IO   |   11 |  GPFSEL1 | FSEL11 | 5-3       |
+| IO1 |   30 | Parallel IO   |   17 |  GPFSEL1 | FSEL17 | 23-21     |
+| IO2 |   31 | Parallel IO   |   18 |  GPFSEL1 | FSEL18 | 26-24     |
+| IO3 |   32 | Parallel IO   |   22 |  GPFSEL2 | FSEL22 | 8-6       |
+| IO4 |   41 | Parallel IO   |   23 |  GPFSEL2 | FSEL23 | 11-9      |
+| IO5 |   42 | Parallel IO   |   24 |  GPFSEL2 | FSEL24 | 14-12     |
+| IO6 |   43 | Parallel IO   |   25 |  GPFSEL2 | FSEL25 | 17-15     |
+| IO7 |   44 | Parallel IO   |   27 |  GPFSEL2 | FSEL27 | 23-21     |
 
 | Pin | NAND | Description   | GPIO | Register | Pin    | GPIO-Bits |
 | --- | ---- | ------------- | ---- | -------- | ------ | --------- |
@@ -42,7 +42,7 @@ Function Select Values:
  - 110 = GPIO Pin takes alternate function 2
  - 111 = GPIO Pin takes alternate function 3
  - 011 = GPIO Pin takes alternate function 4
- - 010 = GPIO Pin takes alternate function 5 
+ - 010 = GPIO Pin takes alternate function 5
 
 # Default Values (after boot):
 
@@ -67,7 +67,7 @@ GPFLSEL1: 00 000 000 000 001 100 100 000 000 000 000
                  18  17                      11  10
 GPFLSEL2: 00 000 000 000 000 100 100 000 000 000 100
                      27      25  24  23  22
-                                               
+
 ```
 
 

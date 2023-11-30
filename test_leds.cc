@@ -40,7 +40,7 @@ uint32_t setFSELValue(uint pin, uint8_t fsel_value) {
 
 // TODO does this need memory barriers, or volatile?
 void setAllPinsFSELValue(volatile void* gpio_memory, uint8_t fsel_value) {
-  // Setup GPLSEL1.
+  // Setup GPFSEL1.
   const uint32_t gpfsel1_curr = *GPFSEL1Register(gpio_memory);
   const uint32_t gpfsel1_mask = getFSELMask(11) | getFSELMask(17) | getFSELMask(18);
   const uint32_t gpfsel1_update =
@@ -99,7 +99,7 @@ void setupControlPins(volatile void* gpio_memory) {
   const uint32_t gpfsel0_after = *GPFSEL0Register(gpio_memory);
   std::cout << "after:   " << std::bitset<32>(gpfsel0_after) << std::endl;
 
-  // Setup GPLSEL1.
+  // Setup GPFSEL1.
   const uint32_t gpfsel1_curr = *GPFSEL1Register(gpio_memory);
   const uint32_t gpfsel1_mask = getFSELMask(10);
   const uint32_t gpfsel1_update =
@@ -114,7 +114,7 @@ void setupControlPins(volatile void* gpio_memory) {
   std::cout << "after:   " << std::bitset<32>(gpfsel1_after) << std::endl;
 }
 
-// TODO are the sleep times sufficient, or does this need busywait?
+// TODO are the sleep times sufficient, or does this need busy wait?
 // Also configures pin 10 for no input pull (external pull-up).
 void setNoPinPulls(volatile void* gpio_memory) {
   // All inputs pull up/down disabled.
@@ -237,7 +237,7 @@ int main() {
     std::cout << "GPLEV1: " << std::bitset<32>(*GPLEV1Register(gpio_memory)) << std::endl;
   }
 
-  // Try to blink the leds?
+  // Try to blink the LEDs?
   setAllPinsOutput(gpio_memory);
   setupControlPins(gpio_memory);
 
@@ -309,7 +309,7 @@ int main() {
 
   const int munmap_result = munmap(const_cast<void*>(gpio_memory), 4096);
   if (munmap_result) {
-    std::cerr << "Could not unmap GPIO memory mappped region" << std::endl;
+    std::cerr << "Could not unmap GPIO memory mapped region" << std::endl;
   }
 
   const int close_result = close(gpio_memory_file);

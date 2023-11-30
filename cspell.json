@@ -1,0 +1,25 @@
+{
+    "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+    "version": "0.2",
+    "dictionaries": [
+        "cpp",
+        "en_US",
+        "softwareTerms"
+    ],
+    "words": [
+        "raspi-gpio",
+        "gpiomem",
+        "GPIO",
+        "GPFSEL0",
+        "GPFSEL1",
+        "GPFSEL2",
+        "FSEL",
+        "GPSET0",
+        "GPCLR0",
+        "GPPUD",
+        "GPPUDCLK0",
+        "GPPUDCLK1",
+        "GPLEV0",
+        "GPLEV1",
+    ]
+}

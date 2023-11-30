@@ -1,5 +1,5 @@
 # Hardware Notes
-Pinout is version 2.0: left side starts with pins 2, 3, 4.
+Raspberry Pi pin out is version 2.0: left side starts with pins 2, 3, 4.
 
 Information is extracted from:
  - https://bob.cs.sonoma.edu/IntroCompOrg-RPi/sec-gpio-pins.html
@@ -61,11 +61,11 @@ GPIO 27: level=0 fsel=0 func=INPUT
 ```
 
 ```
-GPFLSEL0: 00 000 000 000 001 001 000 000 000 100 100
+GPFSEL0: 00 000 000 000 001 001 000 000 000 100 100
               9   8   7           4   3   2
-GPFLSEL1: 00 000 000 000 001 100 100 000 000 000 000
+GPFSEL1: 00 000 000 000 001 100 100 000 000 000 000
                  18  17                      11  10
-GPFLSEL2: 00 000 000 000 000 100 100 000 000 000 100
+GPFSEL2: 00 000 000 000 000 100 100 000 000 000 100
                      27      25  24  23  22
 
 ```

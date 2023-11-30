@@ -5,7 +5,7 @@ Information is extracted from:
  - https://bob.cs.sonoma.edu/IntroCompOrg-RPi/sec-gpio-pins.html
  - https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf
 
-# Pinout
+# Pin Out
 
 | BIT | GPIO | Register | Pin    | GPIO-Bits |
 | --- | ---- | -------- | ------ | --------- |
@@ -17,6 +17,14 @@ Information is extracted from:
 |   5 |   24 |  GPFSEL2 | FSEL24 | 14-12     |
 |   6 |   25 |  GPFSEL2 | FSEL25 | 17-15     |
 |   7 |   27 |  GPFSEL2 | FSEL27 | 23-21     |
+
+| Pin | NAND | Description   | GPIO | Register | Pin    | GPIO-Bits |
+| --- | ---- | ------------- | ---- | -------- | ------ | --------- |
+|  RB |    7 | Ready/Busy    |   10 |  GPFSEL1 | FSEL10 | 2-0       |
+|   R |    8 | Read Enable   |    4 |  GPFSEL0 |  FSEL4 | 14-12     |
+|  CL |   16 | Command Latch |    7 |  GPFSEL0 |  FSEL7 | 23-21     |
+|  AL |   17 | Address Latch |    8 |  GPFSEL0 |  FSEL8 | 26-24     |
+|   W |   18 | Write Enable  |    9 |  GPFSEL0 |  FSEL9 | 29-27     |
 
 # Function Select Register Addresses
 
